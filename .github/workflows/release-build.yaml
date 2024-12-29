@@ -1,0 +1,123 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+    - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+    # this sets us up to build and deploy to AWS ECR. you will still need to
+    # actually build the container and push it. you can use multiarch images
+    # with ECS and EKS/Kubernetes. however, AWS Lambda only likes single arch
+    # images. you will need to set "id-token: write" under permissions for this
+    # to work.
+    #
+    #  - name: Configure AWS
+    #    uses: aws-actions/configure-aws-credentials@v4
+    #    with:
+    #      aws-region: ${{ env.AWS_REGION }}
+    #      role-to-assume: ${{ env.AWS_ROLE_ARN }}
+    #    env:
+    #      AWS_REGION: "us-east-1"
+    #      AWS_ACCOUNT_ID: "arn:aws:iam::1234567890:role/myrole"
+    #
+    #  - name: Login to Amazon ECR
+    #    uses: aws-actions/amazon-ecr-login@v2
+
+    # this sets us up to build and deploy to GHCR. you will still need to
+    # actually build the container and push it. this will build a multiarch
+    # image which works great with ECS and EKS/Kubernetes but not AWS Lambda
+    # you will need to set "packages: write" under permissions for this to
+    # work.
+    #
+    #  - name: Login to ghcr.io
+    #    uses: docker/login-action@v3
+    #    with:
+    #      registry: ghcr.io
+    #      username: ${{ github.repository_owner }}
+    #      password: ${{ secrets.GITHUB_TOKEN }}
+
+    # this is an example of building a single arch image on a specific arch.
+    # this will work well with AWS Lambda.
+    #
+    #  - name: Configure Docker for multi-arch builds#
+    #    uses: docker/setup-qemu-action@v3
+    #
+    #  - name: Build and push container image
+    #    run: |
+    #      docker build -t $IMAGE_NAME:${{ github.ref_name }} -t $IMAGE_NAME:latest .
+    #      docker image push --all-tags $IMAGE_NAME
+    #    env:
+    #      DEFAULT_DOCKER_PLATFORM: linux/arm64
+    #      IMAGE_NAME: 1234567890.dkr.ecr.us-east-1.amazonaws.com/myimage
+
+    # this is an example of building a multiarch image on two archs. this
+    # will work on ECS or EKS/Kubernetes. note that multiarch images do not get
+    # along with GitHub's image expiration action so be careful.
+    #
+    # see: https://github.com/actions/delete-package-versions
+    # see: https://github.com/actions/delete-package-versions/issues/90
+    #
+    #  - name: Set up QEMU for docker multiarch builds
+    #    uses: docker/setup-qemu-action@v3
+    #
+    #  - name: Set up docker buildx
+    #    uses: docker/setup-buildx-action@v3
+    #
+    #  - name: Build and push container images
+    #    run: |
+    #      docker buildx build --push --platform $IMAGE_ARCH -t $IMAGE_NAME:${{ github.ref_name }} -t $IMAGE_NAME:latest .
+    #    env:
+    #      IMAGE_ARCH: linux/amd64,linux/arm64
+    #      IMAGE_NAME: ghcr.io/myaccount/myrepo
+
+      - name: Configure Docker for multi-arch builds
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker buildx for multi-arch builds
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to the GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build, tag, and push docker image to the GitHub Container Registry
+        run: make push
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13.x"
+          cache: "poetry"
+
+      - name: Run python build
+        run: |
+          poetry version ${{ github.ref_name }}
+          poetry build --no-interaction
+
+      - name: Update release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*
+            CHANGELOG.md
+          tag_name: "${{ github.ref_name }}"
+
+      - run: |
+          echo "Finished building and pushing containers for version ${{ github.ref_name }}."

@@ -18,10 +18,14 @@ IMAGE_ID := "${IMAGE_NAME}:${IMAGE_VERSION}"
 
 all: build
 
+.PHONY: vendor
+vendor:
+	go mod vendor
+
 .PHONY: build
 build:
-	@echo "building image for ${IMAGE_ID}"
-	docker build -t $(IMAGE_NAME):latest .
+	mkdir -p ./build
+	go build -o ./build/testrepo ./cmd/testrepo/main.go
 
 .PHONY: buildx
 buildx:
@@ -30,12 +34,22 @@ buildx:
 
 .PHONY: push
 push:
-	@echo "pushing $(IMAGE_ID)"
+	@echo "pushing $(IMAGE_ID) with buildx"
 	docker buildx build --push --platform linux/amd64,linux/arm64 -t $(IMAGE_ID) -t $(IMAGE_NAME):latest .
 
 .PHONY: clean
 clean:
+	rm -rf ./build
 	find . -type f -name .DS_Store -print0 | xargs -0 rm -f
+
+.PHONY: realclean
+realclean: clean
+	go clean -cache
+	go clean -modcache
+
+.PHONY: format
+format:
+	gofmt -s -w -l .
 
 .PHONY: lint
 lint:

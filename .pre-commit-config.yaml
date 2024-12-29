@@ -32,17 +32,26 @@ repos:
       - id: detect-private-key
         stages: [pre-commit]
       - id: mixed-line-ending
-        exclude: "(^.idea/|.vscode/)"
+        exclude: "(^.idea/|.vscode/|CHANGELOG.md|vendor/)"
         stages: [pre-commit]
       - id: trailing-whitespace
-        exclude: "(^.idea/|.vscode/)"
+        exclude: "(^.idea/|.vscode/|CHANGELOG.md|vendor/)"
         stages: [pre-commit]
       - id: end-of-file-fixer
-        exclude: "(^.idea/|.vscode/)"
+        exclude: "(^.idea/|.vscode/|CHANGELOG.md|vendor/)"
         stages: [pre-commit]
       - id: no-commit-to-branch
         args: [--branch, main]
         stages: [pre-commit]
+
+  - repo: local
+    hooks:
+      - id: go-fmt
+        name: go-fmt
+        entry: .pre-commit-hooks/go-fmt.sh
+        language: script
+        files: \.go$
+        exclude: "(vendor/)"
 
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.1.0
