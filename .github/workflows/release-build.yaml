@@ -94,28 +94,17 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+
       - name: Build, tag, and push docker image to the GitHub Container Registry
-        run: make push
-
-      - name: Install poetry
-        run: pipx install poetry
-
-      - name: Setup python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13.x"
-          cache: "poetry"
-
-      - name: Run python build
         run: |
-          poetry version ${{ github.ref_name }}
-          poetry build --no-interaction
+          make build
+          make push
 
       - name: Update release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/*
+            build/*
             CHANGELOG.md
           tag_name: "${{ github.ref_name }}"
 

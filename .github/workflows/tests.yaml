@@ -14,11 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-go@v5
         with:
-          python-version: "3.13.x"
-          cache: "pip"
+          go-version: "^1.24.2"
 
       - name: Run linter
         uses: pre-commit/action@v3.0.1
@@ -49,19 +47,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: pipx install poetry
-
-      - name: Setup python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-go@v5
         with:
-          python-version: "3.13.x"
-          cache: "poetry"
+          go-version: "^1.24.4"
 
-      - name: Run python tests
+      # TODO fix this
+      - name: Run golang tests
         run: |
-          poetry install --no-interaction
-          poetry run pytest --cov=src --cov-report=term --cov-fail-under=50
+          go test -v ./...
 
       - name: Run container tests
         run: |

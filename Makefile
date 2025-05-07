@@ -22,10 +22,14 @@ all: build
 vendor:
 	go mod vendor
 
+.PHONY: test
+test:
+	go test -v ./...
+
 .PHONY: build
 build:
 	mkdir -p ./build
-	go build -o ./build/testrepo ./cmd/testrepo/main.go
+	go build -o ./build/testrepo ./main.go
 
 .PHONY: buildx
 buildx:
