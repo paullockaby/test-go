@@ -1,0 +1,61 @@
+name: Linters and Tests
+
+on:
+  workflow_call:
+
+jobs:
+  pre-commit:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "^1.24.2"
+
+      - name: Run linter
+        uses: pre-commit/action@v3.0.1
+        env:
+          SKIP: no-commit-to-branch
+
+  test:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    # NOTE: just leaving this here as an example
+    #services:
+    #  postgres:
+    #    image: docker.io/library/postgres:17
+    #    env:
+    #      POSTGRES_PASSWORD: postgres
+    #    # set health checks to wait until postgres has started
+    #    options: >-
+    #      --health-cmd pg_isready
+    #      --health-interval 10s
+    #      --health-timeout 5s
+    #      --health-retries 5
+    #    ports:
+    #      - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "^1.24.4"
+
+      # TODO fix this
+      - name: Run golang tests
+        run: |
+          go test -v ./...
+
+      - name: Run container tests
+        run: |
+          docker build .

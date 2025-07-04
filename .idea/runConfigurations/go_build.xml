@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="test-go" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-o $ProjectFileDir$/build/testrepo" />
+    <kind value="DIRECTORY" />
+    <package value="testrepo" />
+    <directory value="$PROJECT_DIR$/" />
+    <filePath value="$PROJECT_DIR$" />
+    <output_directory value="$PROJECT_DIR$/build" />
+    <method v="2" />
+  </configuration>
+</component>
