@@ -1,9 +1,9 @@
-FROM docker.io/library/busybox:1.37.0@sha256:f85340bf132ae937d2c2a763b8335c9bab35d6e8293f70f606b9c6178d84f42b AS base
+FROM docker.io/library/busybox:1.37.0@sha256:d82f458899c9696cb26a7c02d5568f81c8c8223f8661bb2a7988b269c8b9051e AS base
 
 # used to avoid typing the name everywhere
 ENV APP_NAME=testrepo
 
-FROM docker.io/library/golang:1.24.4-bookworm@sha256:10f549dc8489597aa7ed2b62008199bb96717f52a8e8434ea035d5b44368f8a6 AS builder
+FROM docker.io/library/golang:1.25.3-trixie@sha256:88ba6af1b83398ee93c4753b7f746bd979ce369d759a058c80667c46db6341ff AS builder
 
 WORKDIR /app
 
