@@ -16,7 +16,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "^1.24.2"
+          go-version: "^1.25.4"
 
       - name: Run linter
         uses: pre-commit/action@v3.0.1
@@ -49,7 +49,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: "^1.24.4"
+          go-version: "^1.25.4"
 
       # TODO fix this
       - name: Run golang tests
