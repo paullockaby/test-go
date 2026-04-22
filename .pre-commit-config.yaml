@@ -54,7 +54,7 @@ repos:
         exclude: "(vendor/)"
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.13.9
+    rev: v4.13.10
     hooks:
       - id: commitizen
       - id: commitizen-branch
