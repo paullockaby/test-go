@@ -1,4 +1,4 @@
-FROM docker.io/library/busybox:1.37.0@sha256:e3652a00a2fabd16ce889f0aa32c38eec347b997e73bd09e69c962ec7f8732ee AS base
+FROM docker.io/library/busybox:1.37.0@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e AS base
 
 # used to avoid typing the name everywhere
 ENV APP_NAME=testrepo
