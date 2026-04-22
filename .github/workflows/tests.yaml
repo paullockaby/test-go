@@ -5,18 +5,19 @@ on:
 
 jobs:
   pre-commit:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the code
+        uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v5
+      - name: Set up Go
+        uses: actions/setup-go@v6
         with:
-          go-version: "^1.25.4"
+          go-version: "1.26.x"
 
       - name: Run linter
         uses: pre-commit/action@v3.0.1
@@ -45,11 +46,13 @@ jobs:
     #      - 5432:5432
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the code
+        uses: actions/checkout@v6
 
-      - uses: actions/setup-go@v5
+      - name: Set up Go
+        uses: actions/setup-go@v6
         with:
-          go-version: "^1.25.4"
+          go-version: "1.26.x"
 
       # TODO fix this
       - name: Run golang tests

@@ -14,7 +14,8 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the code
+        uses: actions/checkout@v6
 
     # this sets us up to build and deploy to AWS ECR. you will still need to
     # actually build the container and push it. you can use multiarch images
@@ -94,19 +95,8 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-
       - name: Build, tag, and push docker image to the GitHub Container Registry
-        run: |
-          make build
-          make push
-
-      - name: Update release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            build/*
-            CHANGELOG.md
-          tag_name: "${{ github.ref_name }}"
+        run: make push
 
       - run: |
           echo "Finished building and pushing containers for version ${{ github.ref_name }}."
