@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> If you are viewing this repository in GitHub, know that GitHub is [a mirror of the original repository](https://code.lockaby.org/public/test-go).
+
 # test-go
 
 This is a testing ground for building a Go project with all of the bells and whistles of a build pipeline using GitHub Actions.
@@ -24,7 +27,48 @@ TODO
 
 ## Quick Start
 
-TODO
+First you will want to generate an SSH deploy key for the repository, like this:
+
+```
+ssh-keygen -t ed25519 -C commitizen -f deploy_key -P ""
+```
+
+This will create two files: `deploy_key` and `deploy_key.pub`. **DO NOT COMMIT THESE.** Save them off somewhere for future reference.
+
+Once you have the SSH keys, take the `deploy_key.pub` file and add it as a deploy key to the repo and make sure that it has write access. Take the private key, aka the non `.pub` file, and create a secret called `DEPLOY_KEY` in the repo. This will be used by commitizen to push commits with changelog updates to the `main` branch during a release.
+
+Next we need to set a branch ruleset for the repository. Rulesets for branches only work on public repos. Or, if you have paid for a pro account or team plan or enterprise plan, then it will work on private repos, too.
+
+The rule that we're going to create is will look like this:
+
+* Ruleset Name: default
+* Enforcement status: Active
+* Bypass list: deploy keys
+* Target branches: Default
+* Rules: uncheck everything except these:
+  * Restrict deletions
+  * Require a pull request before merging
+    * Required approvals: your call but if you're a solo developer set it to zero
+    * Dismiss stale pull request approvals when new commits are pushed
+    * Require review from Code Owners
+  * Require status checks to pass
+    * Require branches to be up to date before merging
+  * Block force pushes
+
+So to sum up:
+
+1. Create the branch rule as described above.
+2. Create the deploy key as described above.
+3. Tweak the workflows in `.github/workflows` to your liking such that they correctly run lints and tests and builds.
+4. Try making a pull request and watch the tests run.
+5. Merge the pull request and try creating a release.
+
+What is next? In order to use this repository more effectively there are things that you should do locally. These include:
+
+1. Install pre-commit hooks into your local copy of this repository. You can do that by running this: `make pre-commit`. This should push your development "left" and keep from wasting CI time on failed linting.
+2. Make changes only in branches. The branch rule created above will not accept pushes to `main`.
+3. Write commit messages only using convential commit messages. Make sure that the SUBJECT LINE of the pull request describes what the pull request does because that is the only thing that will appear in the changelog.I
+4. When you are ready to make a release, go to GitHub Actions page and choose "Create Releases" and then click "Run workflow" and run the workflow against the `main` branch. You will see, based on the commit messages in your pull requests, an update to CHANGELOG.md, a new tag, a GitHub Release, plus whatever you put into the `release-build.yaml` action.
 
 ## Usage
 
